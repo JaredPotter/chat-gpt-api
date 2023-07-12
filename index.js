@@ -34,8 +34,7 @@ app.post('/api/chat', async (request, response) => {
 async function openChatGpt() {
   console.log('Opening Chrome Window and chat.openai.com...');
 
-  const headless = false;
-  //   const headless = true;
+  const headless = false; // headless = true seems not to work with chatGPT
   const browser = await puppeteer.launch({
     headless,
     timeout: 20000,
