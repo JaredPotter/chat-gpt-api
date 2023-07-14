@@ -1,0 +1,121 @@
+[debug] [2023-07-14T23:07:13.862Z] ----------------------------------------------------------------------
+[debug] [2023-07-14T23:07:13.863Z] Command:       /Users/jared_dev/.nvm/versions/node/v18.16.1/bin/node /opt/homebrew/bin/firebase emulators:start --only functions
+[debug] [2023-07-14T23:07:13.863Z] CLI Version:   12.4.4
+[debug] [2023-07-14T23:07:13.864Z] Platform:      darwin
+[debug] [2023-07-14T23:07:13.864Z] Node Version:  v18.16.1
+[debug] [2023-07-14T23:07:13.865Z] Time:          Fri Jul 14 2023 17:07:13 GMT-0600 (Mountain Daylight Time)
+[debug] [2023-07-14T23:07:13.865Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-07-14T23:07:13.910Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-07-14T23:07:13.910Z] > authorizing via signed-in user (jaredpotter1@gmail.com)
+[info] i  emulators: Starting emulators: functions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions"}}
+[debug] [2023-07-14T23:07:14.514Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2023-07-14T23:07:14.515Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2023-07-14T23:07:14.519Z] [hub] writing locator at /var/folders/cg/0ydws07s6nngkktvlz6x_pc00000gq/T/hub-chat-gpt-api-210d6.json
+[debug] [2023-07-14T23:07:14.730Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2023-07-14T23:07:14.731Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2023-07-14T23:07:14.731Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] ⚠  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: auth, firestore, database, hosting, pubsub, storage {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mauth, firestore, database, hosting, pubsub, storage\u001b[22m"}}
+[warn] ⚠  functions: Your GOOGLE_APPLICATION_CREDENTIALS environment variable points to /Users/jared_dev/code/powderhound/functions/powderhound-b7c60-firebase-adminsdk-b1aep-b80d2dcdfc.json. Non-emulated services will access production using these credentials. Be careful! {"metadata":{"emulator":{"name":"functions"},"message":"Your GOOGLE_APPLICATION_CREDENTIALS environment variable points to /Users/jared_dev/code/powderhound/functions/powderhound-b7c60-firebase-adminsdk-b1aep-b80d2dcdfc.json. Non-emulated services will access production using these credentials. Be careful!"}}
+[debug] [2023-07-14T23:07:14.732Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/chat-gpt-api-210d6/adminSdkConfig [none]
+[debug] [2023-07-14T23:07:14.991Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/chat-gpt-api-210d6/adminSdkConfig 200
+[debug] [2023-07-14T23:07:14.991Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/chat-gpt-api-210d6/adminSdkConfig {"projectId":"chat-gpt-api-210d6","storageBucket":"chat-gpt-api-210d6.appspot.com"}
+[debug] [2023-07-14T23:07:15.020Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"ui"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2023-07-14T23:07:15.021Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"ui"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2023-07-14T23:07:15.021Z] Starting Emulator UI with command {"binary":"node","args":["/Users/jared_dev/.cache/firebase/emulators/ui-v1.11.7/server/server.js"],"optionalArgs":[],"joinArgs":false} {"metadata":{"emulator":{"name":"ui"},"message":"Starting Emulator UI with command {\"binary\":\"node\",\"args\":[\"/Users/jared_dev/.cache/firebase/emulators/ui-v1.11.7/server/server.js\"],\"optionalArgs\":[],\"joinArgs\":false}"}}
+[info] i  ui: Emulator UI logging to ui-debug.log {"metadata":{"emulator":{"name":"ui"},"message":"Emulator UI logging to \u001b[1mui-debug.log\u001b[22m"}}
+[debug] [2023-07-14T23:07:15.105Z] Web / API server started at 127.0.0.1:4000
+ {"metadata":{"emulator":{"name":"ui"},"message":"Web / API server started at 127.0.0.1:4000\n"}}
+[debug] [2023-07-14T23:07:15.105Z] Web / API server started at ::1:4000
+ {"metadata":{"emulator":{"name":"ui"},"message":"Web / API server started at ::1:4000\n"}}
+[info] i  functions: Watching "/Users/jared_dev/code/chat-gpt-api/functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"/Users/jared_dev/code/chat-gpt-api/functions\" for Cloud Functions..."}}
+[debug] [2023-07-14T23:07:15.287Z] Validating nodejs source
+[debug] [2023-07-14T23:07:15.630Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "dotenv": "^16.3.1",
+    "firebase-admin": "^11.8.0",
+    "firebase-functions": "^4.3.1",
+    "twilio": "^4.13.0"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0",
+    "typescript": "^4.9.0"
+  },
+  "private": true
+}
+[debug] [2023-07-14T23:07:15.630Z] Building nodejs source
+[debug] [2023-07-14T23:07:15.630Z] Failed to find version of module node: reached end of search path /Users/jared_dev/code/chat-gpt-api/functions/node_modules
+[info] ✔  functions: Using node@18 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2023-07-14T23:07:15.632Z] Could not find functions.yaml. Must use http discovery
+[debug] [2023-07-14T23:07:15.635Z] Found firebase-functions binary at '/Users/jared_dev/code/chat-gpt-api/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8784
+
+[debug] [2023-07-14T23:07:15.856Z] Got response from /__/functions.yaml {"endpoints":{"handleCustomerSms":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"handleCustomerSms"},"handleNewMessageCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"messages/{docId}"},"retry":false},"entryPoint":"handleNewMessageCreated"}},"specVersion":"v1alpha1","requiredAPIs":[]}
+[info] shutdown requested via /__/quitquitquit
+
+[info] ✔  functions: Loaded functions definitions from source: handleCustomerSms, handleNewMessageCreated. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: handleCustomerSms, handleNewMessageCreated."}}
+[info] ✔  functions[us-central1-handleCustomerSms]: http function initialized (http://127.0.0.1:5001/chat-gpt-api-210d6/us-central1/handleCustomerSms). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/chat-gpt-api-210d6/us-central1/handleCustomerSms)."}}
+[info] i  functions[us-central1-handleNewMessageCreated]: function ignored because the firestore emulator does not exist or is not running. {"metadata":{"emulator":{"name":"functions"},"message":"function ignored because the firestore emulator does not exist or is not running."}}
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌───────────┬────────────────┬─────────────────────────────────┐
+│ Emulator  │ Host:Port      │ View in Emulator UI             │
+├───────────┼────────────────┼─────────────────────────────────┤
+│ Functions │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions │
+└───────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub running at 127.0.0.1:4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+[debug] [2023-07-14T23:07:18.889Z] [work-queue] {"queuedWork":["/chat-gpt-api-210d6/us-central1/handleCustomerSms-2023-07-14T23:07:18.889Z"],"queueLength":1,"runningWork":[],"workRunningCount":0}
+[debug] [2023-07-14T23:07:18.889Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":["/chat-gpt-api-210d6/us-central1/handleCustomerSms-2023-07-14T23:07:18.889Z"],"workRunningCount":1}
+[debug] [2023-07-14T23:07:18.890Z] Accepted request POST /chat-gpt-api-210d6/us-central1/handleCustomerSms --> us-central1-handleCustomerSms
+[debug] [2023-07-14T23:07:18.890Z] [functions] Runtime ready! Sending request! {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Runtime ready! Sending request!"}}
+[debug] [2023-07-14T23:07:18.891Z] [functions] Got req.url=/chat-gpt-api-210d6/us-central1/handleCustomerSms, mapping to path=/ {"metadata":{"emulator":{"name":"functions"},"message":"[functions] Got req.url=/chat-gpt-api-210d6/us-central1/handleCustomerSms, mapping to path=/"}}
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2023-07-14T23:07:18.905Z] [worker-pool] addWorker(us-central1-handleCustomerSms) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] addWorker(us-central1-handleCustomerSms)"}}
+[debug] [2023-07-14T23:07:18.907Z] [worker-pool] Adding worker with key us-central1-handleCustomerSms, total=1 {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] Adding worker with key us-central1-handleCustomerSms, total=1"}}
+[debug] [2023-07-14T23:07:19.267Z] [runtime-status] [37139] Resolved module firebase-admin {"declared":true,"installed":true,"version":"11.10.1","resolution":"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-admin/lib/index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[runtime-status] [37139] Resolved module firebase-admin {\"declared\":true,\"installed\":true,\"version\":\"11.10.1\",\"resolution\":\"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-admin/lib/index.js\"}"}}
+[debug] [2023-07-14T23:07:19.267Z] [runtime-status] [37139] Resolved module firebase-functions {"declared":true,"installed":true,"version":"4.4.1","resolution":"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-functions/lib/v1/index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[runtime-status] [37139] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"4.4.1\",\"resolution\":\"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-functions/lib/v1/index.js\"}"}}
+[debug] [2023-07-14T23:07:19.267Z] [runtime-status] [37139] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"}] {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[runtime-status] [37139] Outgoing network have been stubbed. [{\"name\":\"http\",\"status\":\"mocked\"},{\"name\":\"http\",\"status\":\"mocked\"},{\"name\":\"https\",\"status\":\"mocked\"},{\"name\":\"https\",\"status\":\"mocked\"},{\"name\":\"net\",\"status\":\"mocked\"}]"}}
+[debug] [2023-07-14T23:07:19.268Z] [runtime-status] [37139] Resolved module firebase-functions {"declared":true,"installed":true,"version":"4.4.1","resolution":"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-functions/lib/v1/index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[runtime-status] [37139] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"4.4.1\",\"resolution\":\"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-functions/lib/v1/index.js\"}"}}
+[debug] [2023-07-14T23:07:19.342Z] [runtime-status] [37139] Checked functions.config() {"config":{}} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[runtime-status] [37139] Checked functions.config() {\"config\":{}}"}}
+[debug] [2023-07-14T23:07:19.342Z] [runtime-status] [37139] firebase-functions has been stubbed. {"functionsResolution":{"declared":true,"installed":true,"version":"4.4.1","resolution":"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-functions/lib/v1/index.js"}} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[runtime-status] [37139] firebase-functions has been stubbed. {\"functionsResolution\":{\"declared\":true,\"installed\":true,\"version\":\"4.4.1\",\"resolution\":\"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-functions/lib/v1/index.js\"}}"}}
+[debug] [2023-07-14T23:07:19.342Z] [runtime-status] [37139] Resolved module firebase-functions {"declared":true,"installed":true,"version":"4.4.1","resolution":"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-functions/lib/v1/index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[runtime-status] [37139] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"4.4.1\",\"resolution\":\"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-functions/lib/v1/index.js\"}"}}
+[debug] [2023-07-14T23:07:19.343Z] [runtime-status] [37139] Resolved module firebase-admin {"declared":true,"installed":true,"version":"11.10.1","resolution":"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-admin/lib/index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[runtime-status] [37139] Resolved module firebase-admin {\"declared\":true,\"installed\":true,\"version\":\"11.10.1\",\"resolution\":\"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-admin/lib/index.js\"}"}}
+[debug] [2023-07-14T23:07:19.344Z] [runtime-status] [37139] Resolved module firebase-functions {"declared":true,"installed":true,"version":"4.4.1","resolution":"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-functions/lib/v1/index.js"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[runtime-status] [37139] Resolved module firebase-functions {\"declared\":true,\"installed\":true,\"version\":\"4.4.1\",\"resolution\":\"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-functions/lib/v1/index.js\"}"}}
+[debug] [2023-07-14T23:07:19.344Z] [runtime-status] [37139] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"11.10.1","resolution":"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-admin/lib/index.js"}} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[runtime-status] [37139] firebase-admin has been stubbed. {\"adminResolution\":{\"declared\":true,\"installed\":true,\"version\":\"11.10.1\",\"resolution\":\"/Users/jared_dev/code/chat-gpt-api/functions/node_modules/firebase-admin/lib/index.js\"}}"}}
+[debug] [2023-07-14T23:07:19.388Z] [runtime-status] [37139] Functions runtime initialized. {"cwd":"/Users/jared_dev/code/chat-gpt-api/functions","node_version":"18.16.1"} {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[runtime-status] [37139] Functions runtime initialized. {\"cwd\":\"/Users/jared_dev/code/chat-gpt-api/functions\",\"node_version\":\"18.16.1\"}"}}
+[debug] [2023-07-14T23:07:19.388Z] [runtime-status] [37139] Listening to port: /var/folders/cg/0ydws07s6nngkktvlz6x_pc00000gq/T/fire_emu_ea24a94e115c95ea.sock {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[runtime-status] [37139] Listening to port: /var/folders/cg/0ydws07s6nngkktvlz6x_pc00000gq/T/fire_emu_ea24a94e115c95ea.sock"}}
+[debug] [2023-07-14T23:07:19.424Z] [worker-us-central1-handleCustomerSms-1786ba98-2689-4375-899e-26f85d3c2887]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[worker-us-central1-handleCustomerSms-1786ba98-2689-4375-899e-26f85d3c2887]: IDLE"}}
+[debug] [2023-07-14T23:07:19.424Z] [worker-pool] submitRequest(triggerId=us-central1-handleCustomerSms) {"metadata":{"emulator":{"name":"functions"},"message":"[worker-pool] submitRequest(triggerId=us-central1-handleCustomerSms)"}}
+[info] i  functions: Beginning execution of "us-central1-handleCustomerSms" {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"Beginning execution of \"us-central1-handleCustomerSms\""}}
+[debug] [2023-07-14T23:07:19.424Z] [worker-us-central1-handleCustomerSms-1786ba98-2689-4375-899e-26f85d3c2887]: BUSY {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[worker-us-central1-handleCustomerSms-1786ba98-2689-4375-899e-26f85d3c2887]: BUSY"}}
+[info] >  url: http://136.38.53.221:3000/api/chat {"user":"url: http://136.38.53.221:3000/api/chat","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"\u001b[90m> \u001b[39m url: http://136.38.53.221:3000/api/chat"}}
+[debug] [2023-07-14T23:08:07.630Z] Finishing up request with event=pause {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"Finishing up request with event=pause"}}
+[info] i  functions: Finished "us-central1-handleCustomerSms" in 48206.488667ms {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"Finished \"us-central1-handleCustomerSms\" in 48206.488667ms"}}
+[debug] [2023-07-14T23:08:07.632Z] [worker-us-central1-handleCustomerSms-1786ba98-2689-4375-899e-26f85d3c2887]: IDLE {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"[worker-us-central1-handleCustomerSms-1786ba98-2689-4375-899e-26f85d3c2887]: IDLE"}}
+[debug] [2023-07-14T23:08:07.632Z] Finishing up request with event=finish {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"Finishing up request with event=finish"}}
+[debug] [2023-07-14T23:08:07.632Z] Finishing up request with event=close {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-handleCustomerSms"},"extension":{},"message":"Finishing up request with event=close"}}
+[debug] [2023-07-14T23:08:07.632Z] [work-queue] {"queuedWork":[],"queueLength":0,"runningWork":[],"workRunningCount":0}
