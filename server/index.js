@@ -16,6 +16,10 @@ const WINDOW_HEIGHT = 1000;
 const WINDOW_WIDTH = 1000;
 let page;
 
+const IS_DEV = process.argv[2] === '--is_dev' ? true : false;
+
+console.log('IS_DEV: ' + IS_DEV);
+
 app.post('/api/chat', async (request, response) => {
   const query = request.body.query;
   console.log(`/api/chat CALLED - query: ${query}`);
@@ -148,96 +152,123 @@ async function queryChatGpt(
     '//button[@as="button"]//div[contains(text(), "Regenerate response")]';
   await page.waitForXPath(regenerateButtonXPath, { timeout: puppeteerTimeout });
 
-  const responseMessage = await page.evaluate(async (isJsonResponse) => {
-    const chatMessages = document.querySelectorAll(
-      '.group.w-full.text-gray-800'
-    );
-    let mostRecentMessage = chatMessages[chatMessages.length - 1];
-    let resultMessage = '';
-    // Attempt to get a <code> block.
-    if (isJsonResponse) {
-      const responseMessageCodeSelector = '#__next code';
-      const codeElement = mostRecentMessage.querySelector(
-        responseMessageCodeSelector
+  const responseMessage = await page.evaluate(
+    async (parameters) => {
+      const chatMessages = document.querySelectorAll(
+        '.group.w-full.text-gray-800'
       );
-
-      try {
-        resultMessage = JSON.parse(codeElement.textContent);
-        // throw 'blah';
-      } catch (error) {
-        // Attempt to get JSON via manual parsing.
-        const mostRecentMessageElement =
-          mostRecentMessage.querySelector('.markdown.prose');
-        mostRecentMessage = mostRecentMessageElement.textContent;
+      let mostRecentMessage = chatMessages[chatMessages.length - 1];
+      let resultMessage = '';
+      // Attempt to get a <code> block.
+      if (parameters.isJsonResponse) {
+        const responseMessageCodeSelector = '#__next code';
+        const codeElement = mostRecentMessage.querySelector(
+          responseMessageCodeSelector
+        );
 
         try {
-          const startIndices = [
-            mostRecentMessage.indexOf('{'),
-            mostRecentMessage.indexOf('['),
-          ];
-          const validStartIndex = Math.min(...startIndices.filter(Boolean));
+          resultMessage = JSON.parse(codeElement.textContent);
+        } catch (error) {
+          // Attempt to get JSON via manual parsing.
+          const mostRecentMessageElement =
+            mostRecentMessage.querySelector('.markdown.prose');
+          mostRecentMessage = mostRecentMessageElement.textContent;
 
-          if (validStartIndex !== -1) {
-            let depth = 0;
-            for (let i = validStartIndex; i < mostRecentMessage.length; i++) {
-              if (
-                mostRecentMessage[i] === '{' ||
-                mostRecentMessage[i] === '['
-              ) {
-                depth++;
-              } else if (
-                mostRecentMessage[i] === '}' ||
-                mostRecentMessage[i] === ']'
-              ) {
-                depth--;
-                if (depth === 0) {
-                  try {
-                    resultMessage = JSON.parse(
-                      mostRecentMessage.substring(validStartIndex, i + 1)
-                    );
-                    break;
-                  } catch (e) {
-                    console.log('Invalid JSON detected');
+          // resultMessage = parameters.extractJSON(mostRecentMessage); // does not wor
+          try {
+            const startIndices = [
+              mostRecentMessage.indexOf('{'),
+              mostRecentMessage.indexOf('['),
+            ];
+            const validStartIndex = Math.min(...startIndices.filter(Boolean));
+
+            if (validStartIndex !== -1) {
+              let depth = 0;
+              for (let i = validStartIndex; i < mostRecentMessage.length; i++) {
+                if (
+                  mostRecentMessage[i] === '{' ||
+                  mostRecentMessage[i] === '['
+                ) {
+                  depth++;
+                } else if (
+                  mostRecentMessage[i] === '}' ||
+                  mostRecentMessage[i] === ']'
+                ) {
+                  depth--;
+                  if (depth === 0) {
+                    try {
+                      resultMessage = JSON.parse(
+                        mostRecentMessage.substring(validStartIndex, i + 1)
+                      );
+                      break;
+                    } catch (e) {
+                      console.log('Invalid JSON detected');
+                    }
                   }
                 }
               }
             }
+          } catch (error) {
+            console.log(error);
           }
-        } catch (error) {
-          console.log(error);
         }
-        // resultMessage = JSON.parse(mostRecentCodeBlockNode.textContent);
+      } else {
+        // const responseMessageSelector =
+        //   '#__next > div.overflow-hidden.w-full.h-full.relative.flex.z-0 > div > div > main > div.flex-1.overflow-hidden > div > div > div > div > div > div.gap-1';
+        // const messages = document.querySelectorAll(responseMessageSelector);
+        // const mostRecentMessageNode = messages[messages.length - 1];
+        // resultMessage = mostRecentMessageNode.textContent;
+
+        const mostRecentMessageElement =
+          mostRecentMessage.querySelector('.markdown.prose');
+        mostRecentMessage = mostRecentMessageElement.textContent;
+
+        resultMessage = mostRecentMessage.replace('1 / 1', '');
       }
-    } else {
-      const responseMessageSelector =
-        '#__next > div.overflow-hidden.w-full.h-full.relative.flex.z-0 > div > div > main > div.flex-1.overflow-hidden > div > div > div > div > div > div.gap-1';
-      const messages = document.querySelectorAll(responseMessageSelector);
-      const mostRecentMessageNode = messages[messages.length - 1];
-      resultMessage = mostRecentMessageNode.textContent;
 
-      resultMessage = resultMessage.replace('1 / 1', '');
+      return resultMessage;
+    },
+    {
+      isJsonResponse,
+      extractJSON,
     }
-
-    return resultMessage;
-  }, isJsonResponse);
+  );
 
   return responseMessage;
 }
 
-async function extractJSON(str) {
-  var regex = /({.*}|\[.*\])/; // This regex will match anything within {} or []
-  var match = str.match(regex); // Find the match
-  if (match) {
-    try {
-      var obj = JSON.parse(match[0]); // Try to parse the matched string
-      if (obj && typeof obj === 'object') {
-        return obj; // If parse is successful, return the object
+async function extractJSON(string) {
+  let jsonObject;
+
+  try {
+    const startIndices = [string.indexOf('{'), string.indexOf('[')];
+    const validStartIndex = Math.min(...startIndices.filter(Boolean));
+
+    if (validStartIndex !== -1) {
+      let depth = 0;
+      for (let i = validStartIndex; i < string.length; i++) {
+        if (string[i] === '{' || string[i] === '[') {
+          depth++;
+        } else if (string[i] === '}' || string[i] === ']') {
+          depth--;
+          if (depth === 0) {
+            try {
+              jsonObject = JSON.parse(string.substring(validStartIndex, i + 1));
+              break;
+            } catch (e) {
+              console.log('Invalid JSON detected');
+            }
+          }
+        }
       }
-    } catch (e) {
-      console.log('Invalid JSON detected');
     }
+  } catch (error) {
+    console.error(error);
+
+    return null;
   }
-  return null;
+
+  return jsonObject;
 }
 
 async function openChrome() {
@@ -251,6 +282,10 @@ async function openChrome() {
     `--window-size=${WINDOW_WIDTH},${WINDOW_HEIGHT}`,
     // `--user-data-dir=$(mktemp -d -t "chrome-remote_data_dir)"`,
   ];
+
+  if (IS_DEV) {
+    chromeLauncherFlags.push('--auto-open-devtools-for-tabs');
+  }
   const wsChromeEndpointUrl = await startChromeProcess(
     chromeLauncher,
     chromeLauncherFlags
@@ -273,7 +308,7 @@ async function openChrome() {
       '--no-first-run',
       '--no-sandbox',
       '--no-zygote',
-      '--window-size=1280,720',
+      `--window-size=${WINDOW_WIDTH},${WINDOW_HEIGHT}`,
     ],
   });
 
