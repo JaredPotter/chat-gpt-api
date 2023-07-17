@@ -3,7 +3,9 @@
   "description": "ChatGPT API",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "start_forever": "pm2 start index.js",
+    "stop_forever": "pm2 stop index.js"
   },
   "engines": {
     "node": "18"
