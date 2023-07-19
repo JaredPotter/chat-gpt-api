@@ -51,19 +51,23 @@
                   :class="{
                     'date-time-right':
                       currentUser.phone_number === message.from_phone_number,
+                    'date-time-left':
+                      currentUser.phone_number !== message.from_phone_number,
                   }"
                 >
-                  {{ formatUnixTime(message.unix) }}
+                  {{ formatUnixTime(message.created_at_unix) }}
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div v-else>No messages yet</div>
+        <div v-else class="no-messages-box">
+          <div>No messages</div>
+        </div>
       </div>
     </div>
     <div class="bottom">
-      <div class="chat-gpt">
+      <div v-show="currentUser.is_admin" class="chat-gpt">
         <label for="chatGptIsEnabledCheckbox" class="chat-gpt-label">
           <span>chatGPT Enabled:</span>
           <input
@@ -79,12 +83,12 @@
       <div class="textarea-and-button">
         <textarea
           v-model="messageToSend"
-          @keyup.enter="handleSend"
+          @keyup.enter.exact="handleSend"
           class="message-input"
-          :disabled="conversation.is_chat_gpt_enabled"
+          :disabled="currentUser.is_admin && conversation.is_chat_gpt_enabled"
         ></textarea>
         <button
-          :disabled="!messageToSend"
+          :disabled="!messageToSend || conversation.is_chat_gpt_enabled"
           @click="handleSend"
           class="send-button"
         >
@@ -182,8 +186,8 @@ export default class Conversation extends Vue {
         from_name: this.currentUser.name,
         to_phone_number: this.conversation.to.phone_number,
         to_name: this.conversation.to.name,
-        date_time: serverTimestamp(),
-        unix: Date.now(),
+        created_at_date_time: serverTimestamp(),
+        created_at_unix: Date.now(),
         message: this.messageToSend,
       };
 
@@ -227,17 +231,22 @@ export default class Conversation extends Vue {
 }
 
 .middle {
+  background-color: #1e1e1e;
 }
 
 .scrollable {
   overflow: auto;
   height: 100%;
+  color: white;
+  font-size: 1.75rem;
+  display: flex;
+  flex-direction: column-reverse;
+  background-color: #1e1e1e;
 }
 
 .message-list {
-  max-width: 7500px;
-  border: 1px solid black;
-  background-color: #1e1e1e;
+  display: flex;
+  flex-direction: column;
 }
 
 .message {
@@ -279,10 +288,24 @@ export default class Conversation extends Vue {
 .message-bubble {
   border-radius: 10px;
   padding: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.date-time-left {
+  text-align: left;
+  font-size: 1.25rem;
 }
 
 .date-time-right {
   text-align: right;
+  font-size: 1.25rem;
+}
+
+.no-messages-box {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .bottom {

@@ -2,6 +2,12 @@
   <div class="app-container">
     <div class="conversation-list-container">
       <h3>Conversations</h3>
+      <div v-if="currentUser && otherUser">
+        Welcome, {{ currentUser.name }}.
+        <button @click="handleUserSwitch">
+          Switch to {{ otherUser.name }}
+        </button>
+      </div>
       <div>
         <div
           v-for="(conversation, index) in conversations"
@@ -19,6 +25,9 @@
           <div>
             {{ formatDate(conversation.last_active_at) }}
           </div>
+          <button @click="() => handleDeleteMessages(conversation)">
+            Delete Messages
+          </button>
         </div>
       </div>
     </div>
@@ -43,6 +52,8 @@ import {
   getDoc,
   onSnapshot,
   orderBy,
+  deleteDoc,
+  doc,
 } from "firebase/firestore";
 import dayjs from "dayjs";
 import "dayjs/locale/en"; // Import the locale you want to use
@@ -83,7 +94,7 @@ import FirebaseService from "./FirebaseService";
     //     //     query(
     //     //       collection(FirebaseService.firestore, "messages"),
     //     //       where("conversation_id", "==", conversation.id),
-    //     //       orderBy("unix", "desc")
+    //     //       orderBy("created_at_unix", "desc")
     //     //     ),
     //     //     (snapshot) => {
     //     //       // Reverse the messages so they appear correctly.
@@ -108,8 +119,16 @@ export default class App extends Vue {
     messages: [],
   };
   // currently hard coded.
-  currentUser = { phone_number: "+18775221772", name: "Twilio" };
-  // currentUser = { phone_number: "+18015747900", name: "Jared Potter" };
+  currentUser = {
+    phone_number: "+18775221772",
+    name: "Twilio",
+    is_admin: true,
+  };
+  otherUser = {
+    phone_number: "+18015747900",
+    name: "Jared Potter",
+    is_admin: false,
+  };
 
   public fetchConversations = async () => {
     const peopleQuerySnapshot = await getDocs(
@@ -167,7 +186,7 @@ export default class App extends Vue {
         query(
           collection(FirebaseService.firestore, "messages"),
           where("conversation_id", "==", conversation.id),
-          orderBy("unix", "desc")
+          orderBy("created_at_unix", "desc")
         ),
         (snapshot) => {
           // Reverse the messages so they appear correctly.
@@ -185,7 +204,7 @@ export default class App extends Vue {
         query(
           collection(FirebaseService.firestore, "messages"),
           where("conversation_id", "==", conversation.id),
-          orderBy("unix", "desc")
+          orderBy("created_at_unix", "desc")
         )
       );
       // Reverse the messages so they appear correctly.
@@ -216,6 +235,32 @@ export default class App extends Vue {
     this.selectedConversationIndex = index;
     this.selectedConversation =
       this.conversations[this.selectedConversationIndex];
+  }
+
+  public handleUserSwitch() {
+    const temp = this.otherUser;
+    this.otherUser = this.currentUser;
+    this.currentUser = temp;
+
+    this.fetchConversations();
+  }
+
+  public async handleDeleteMessages(conversation: any) {
+    const isDelete = window.confirm(
+      "Are you sure you want to delete all messsages? OK for yes, Cancel for no."
+    );
+
+    if (isDelete) {
+      const messagesSnapshot = await getDocs(
+        query(
+          collection(FirebaseService.firestore, "messages"),
+          where("conversation_id", "==", conversation.id)
+        )
+      );
+      messagesSnapshot.docs.forEach(async (messageDoc) => {
+        deleteDoc(messageDoc.ref);
+      });
+    }
   }
 }
 </script>
@@ -256,7 +301,7 @@ export default class App extends Vue {
   color: white;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 650px) {
   .conversation-list-container {
     display: none;
   }
