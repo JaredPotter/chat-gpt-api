@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 const puppeteerTimeout = 90000;
 const COOKIES_PATH = '../cookies/latest_cookies.json';
-const WINDOW_HEIGHT = 1000;
+const WINDOW_HEIGHT = 1500;
 const WINDOW_WIDTH = 1000;
 let page;
 
@@ -159,9 +159,10 @@ async function queryChatGpt(
       );
       let mostRecentMessage = chatMessages[chatMessages.length - 1];
       let resultMessage = '';
+
       // Attempt to get a <code> block.
       if (parameters.isJsonResponse) {
-        const responseMessageCodeSelector = '#__next code';
+        const responseMessageCodeSelector = 'code';
         const codeElement = mostRecentMessage.querySelector(
           responseMessageCodeSelector
         );
@@ -169,12 +170,21 @@ async function queryChatGpt(
         try {
           resultMessage = JSON.parse(codeElement.textContent);
         } catch (error) {
+          console.log('Failed to find/parse <code> block. Attempt manually.');
+
           // Attempt to get JSON via manual parsing.
           const mostRecentMessageElement =
             mostRecentMessage.querySelector('.markdown.prose');
           mostRecentMessage = mostRecentMessageElement.textContent;
 
-          // resultMessage = parameters.extractJSON(mostRecentMessage); // does not wor
+          try {
+            resultMessage = JSON.parse(mostRecentMessage);
+          } catch (error) {
+            // failed. Try manual parse.
+          }
+
+          console.log('attempting manual parse on: ' + mostRecentMessage);
+
           try {
             const startIndices = [
               mostRecentMessage.indexOf('{'),
@@ -209,22 +219,16 @@ async function queryChatGpt(
               }
             }
           } catch (error) {
-            console.log(error);
+            console.log(JSON.stringify(error, null, 4));
           }
         }
       } else {
-        // const responseMessageSelector =
-        //   '#__next > div.overflow-hidden.w-full.h-full.relative.flex.z-0 > div > div > main > div.flex-1.overflow-hidden > div > div > div > div > div > div.gap-1';
-        // const messages = document.querySelectorAll(responseMessageSelector);
-        // const mostRecentMessageNode = messages[messages.length - 1];
-        // resultMessage = mostRecentMessageNode.textContent;
-
-        const mostRecentMessageElement =
-          mostRecentMessage.querySelector('.markdown.prose');
-        mostRecentMessage = mostRecentMessageElement.textContent;
+        mostRecentMessage = mostRecentMessage.textContent;
 
         resultMessage = mostRecentMessage.replace('1 / 1', '');
       }
+
+      console.log('resultMessage: ' + resultMessage);
 
       return resultMessage;
     },
