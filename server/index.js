@@ -106,13 +106,41 @@ async function openChatGpt() {
       () => {}
     );
 
-    // Delete welcome modal
-    await page.evaluate(() => {
-      const element = document.querySelector('.absolute.inset-0');
-      if (element) {
-        element.remove();
+    // Get Model
+    const modalHeaderText = await page.evaluate(() => {
+      const modalElement = document.querySelector('.absolute.inset-0');
+
+      if (modalElement) {
+        const modalHeaderElement = modalElement.querySelector('h2');
+
+        if (modalHeaderElement) {
+          const modalHeaderText = modalHeaderElement.textContent;
+
+          if (modalHeaderText === 'Your session has expired') {
+            return modalHeaderText;
+          } else if (modalHeaderText === 'some intro...') {
+            modalElement.remove();
+          }
+        }
       }
+
+      return '';
     });
+
+    if (modalHeaderText === 'Your session has expired') {
+      console.log('chatGpt session expired. Please log back in.');
+
+      try {
+        fs.unlinkSync(COOKIES_PATH);
+      } catch (error) {
+        /* nothing */
+      }
+
+      await page.goto('https://chat.openai.com/auth/login');
+
+      const loginButtonElement = await page.waitForSelector('button');
+      loginButtonElement.click();
+    }
   } catch (error) {
     console.error(error);
   }
@@ -149,14 +177,12 @@ async function queryChatGpt(
   await page.keyboard.press('Enter');
 
   const regenerateButtonXPath =
-    '//button[@as="button"]//div[contains(text(), "Regenerate response")]';
+    '//button[@as="button"]//div[contains(text(), "Regenerate")]';
   await page.waitForXPath(regenerateButtonXPath, { timeout: puppeteerTimeout });
 
   const responseMessage = await page.evaluate(
     async (parameters) => {
-      const chatMessages = document.querySelectorAll(
-        '.group.w-full.text-gray-800'
-      );
+      const chatMessages = document.querySelectorAll('.items-start');
       let mostRecentMessage = chatMessages[chatMessages.length - 1];
       let resultMessage = '';
 
@@ -184,40 +210,73 @@ async function queryChatGpt(
           }
 
           console.log('attempting manual parse on: ' + mostRecentMessage);
+          const text = mostRecentMessage;
 
           try {
-            const startIndices = [
-              mostRecentMessage.indexOf('{'),
-              mostRecentMessage.indexOf('['),
-            ];
-            const validStartIndex = Math.min(...startIndices.filter(Boolean));
+            let stack = [];
+            let jsons = [];
+            let start = -1;
 
-            if (validStartIndex !== -1) {
-              let depth = 0;
-              for (let i = validStartIndex; i < mostRecentMessage.length; i++) {
-                if (
-                  mostRecentMessage[i] === '{' ||
-                  mostRecentMessage[i] === '['
-                ) {
-                  depth++;
-                } else if (
-                  mostRecentMessage[i] === '}' ||
-                  mostRecentMessage[i] === ']'
-                ) {
-                  depth--;
-                  if (depth === 0) {
-                    try {
-                      resultMessage = JSON.parse(
-                        mostRecentMessage.substring(validStartIndex, i + 1)
-                      );
-                      break;
-                    } catch (e) {
-                      console.log('Invalid JSON detected');
-                    }
+            for (let i = 0; i < text.length; i++) {
+              let char = text[i];
+
+              // Push the index onto the stack when we meet an opening bracket
+              if (char === '{' || char === '[') {
+                stack.push(i);
+                if (start === -1) start = i;
+              }
+
+              // When we meet a closing bracket, we check if the stack is empty after popping
+              // If it is, then we know this is an outermost closing bracket
+              if (char === '}' || char === ']') {
+                stack.pop();
+                if (stack.length === 0) {
+                  // Extract the JSON and add it to the list
+                  let jsonText = text.slice(start, i + 1);
+                  try {
+                    let json = JSON.parse(jsonText);
+                    jsons.push(json);
+                    start = -1;
+                  } catch (err) {
+                    console.log('Failed to parse:', jsonText);
                   }
                 }
               }
             }
+
+            responseMessage = jsons[0];
+            // const startIndices = [
+            //   mostRecentMessage.indexOf('{'),
+            //   mostRecentMessage.indexOf('['),
+            // ];
+            // const validStartIndex = Math.min(...startIndices.filter(Boolean));
+
+            // if (validStartIndex !== -1) {
+            //   let depth = 0;
+            //   for (let i = validStartIndex; i < mostRecentMessage.length; i++) {
+            //     if (
+            //       mostRecentMessage[i] === '{' ||
+            //       mostRecentMessage[i] === '['
+            //     ) {
+            //       depth++;
+            //     } else if (
+            //       mostRecentMessage[i] === '}' ||
+            //       mostRecentMessage[i] === ']'
+            //     ) {
+            //       depth--;
+            //       if (depth === 0) {
+            //         try {
+            //           resultMessage = JSON.parse(
+            //             mostRecentMessage.substring(validStartIndex, i + 1)
+            //           );
+            //           break;
+            //         } catch (e) {
+            //           console.log('Invalid JSON detected');
+            //         }
+            //       }
+            //     }
+            //   }
+            // }
           } catch (error) {
             console.log(JSON.stringify(error, null, 4));
           }
@@ -228,7 +287,7 @@ async function queryChatGpt(
         resultMessage = mostRecentMessage.replace('1 / 1', '');
       }
 
-      console.log('resultMessage: ' + resultMessage);
+      console.log('resultMessage: ' + JSON.stringify(resultMessage, null, 4));
 
       return resultMessage;
     },
@@ -237,6 +296,8 @@ async function queryChatGpt(
       extractJSON,
     }
   );
+
+  console.log('responseMessage: ' + JSON.stringify(responseMessage, null, 4));
 
   return responseMessage;
 }
