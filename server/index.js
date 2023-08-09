@@ -421,18 +421,32 @@ async function startChromeProcess(chromeLauncher, chromeLauncherFlags) {
 
   await sleep(2500);
 
-  try {
+  let attempts = 0;
+  const maxAttempts = 5;
+  let data;
+
+  while (attempts < maxAttempts) {
     const url = "http://127.0.0.1:9222/json/version";
     console.log("Fetching webSocket URL... " + url);
-    const response = await axios.get(url);
-    const data = response.data;
-    return data.webSocketDebuggerUrl;
-  } catch (error) {
-    console.error(error);
-    console.error("error - " + JSON.stringify(error, null, 4));
-    console.log("Request failed. Exiting now.");
-    return;
+
+    try {
+      const response = await axios.get(url);
+      data = response.data;
+
+      if (data) {
+        break;
+      }
+    } catch (error) {
+      console.error("error - " + JSON.stringify(error, null, 4));
+    }
+
+    attempts++;
+
+    // Sleep for 5 seconds before the next attempt
+    await sleep(5000);
   }
+
+  return data.webSocketDebuggerUrl;
 }
 
 async function sleep(ms) {
