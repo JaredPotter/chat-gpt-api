@@ -354,7 +354,7 @@ async function openChrome() {
     chromeLauncher = `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`;
   } else if (process.platform === "linux") {
     console.log("Running on Linux");
-    spawnSync("killall", [`Google Chrome`]);
+    spawnSync("killall", [`google-chrome`]);
     chromeLauncher = `/usr/bin/google-chrome`;
   }
 
@@ -403,6 +403,8 @@ async function closeChrome() {
     crossSpawnSync("powershell", ["kill", "-n", "chrome"]);
   } else if (process.platform === "darwin" || process.platform === "linux") {
     crossSpawnSync("killall", [`Google Chrome`]);
+  } else if (process.platform === "linux") {
+    crossSpawnSync("killall", [`google-chrome`]);
   }
 }
 
