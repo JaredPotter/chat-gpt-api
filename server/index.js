@@ -366,9 +366,9 @@ async function openChrome() {
     // `--user-data-dir=$(mktemp -d -t "chrome-remote_data_dir)"`,
   ];
 
-  if (process.platform === "linux") {
-    chromeLauncherFlags.push("--headless");
-  }
+  // if (process.platform === "linux") {
+  //   chromeLauncherFlags.push("--headless");
+  // }
 
   if (IS_DEV) {
     chromeLauncherFlags.push("--auto-open-devtools-for-tabs");
