@@ -1,30 +1,37 @@
-import { onRequest } from "firebase-functions/v2/https";
-import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import { onRequest } from 'firebase-functions/v2/https';
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 
-require("dotenv").config();
-const twilio = require("twilio");
-import FirebaseService from "./FirebaseService";
-import ChatGptService from "./ChatGptService";
-import HouseCleaningServiceRequest from "./models/HouseCleaningServiceRequest";
-import ServiceType from "./enums/ServiceType";
-import BaseServiceRequest from "./models/BaseServiceRequest";
+require('dotenv').config();
+const twilio = require('twilio');
+const axios = require('axios');
+import FirebaseService from './FirebaseService';
+import ChatGptService from './ChatGptService';
+import HouseCleaningServiceRequest from './models/HouseCleaningServiceRequest';
+import ServiceType from './enums/ServiceType';
+import BaseServiceRequest from './models/BaseServiceRequest';
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER
   ? process.env.TWILIO_PHONE_NUMBER
-  : "";
+  : '';
+const twilioAdminPhoneNumber = process.env.TWILIO_ADMIN_PHONE_NUMBER
+  ? process.env.TWILIO_ADMIN_PHONE_NUMBER
+  : '';
 const client = twilio(accountSid, authToken);
 const ADMIN_NAME = process.env.ADMIN_NAME;
 
 // Firebase Functions Exports
+// exports.accountcleanup = onSchedule("every day 00:00", async (event) => {
+exports.keepSessionActive = onSchedule('every minute', keepSessionActive);
 exports.handleCustomerSms = onRequest(handleCustomerSms);
 exports.handleNewMessageCreated = onDocumentCreated(
-  "messages/{docId}",
+  'messages/{docId}',
   handleNewMessageCreated
 );
 exports.dev = onRequest(async (request, response) => {
-  console.log("dev() function called");
+  console.log('dev() function called');
   //   let existingCustomerServiceRequests = await FirebaseService.getDocs(
   //     "service_requests",
   //     [
@@ -46,31 +53,31 @@ exports.dev = onRequest(async (request, response) => {
   //   );
 
   const recentMessages = await FirebaseService.getDocs(
-    "messages",
+    'messages',
     [
       {
-        field: "id",
-        operator: "==",
-        value: "13FvGLGcF9lBngquQ8it",
+        field: 'id',
+        operator: '==',
+        value: '13FvGLGcF9lBngquQ8it',
       },
     ],
-    { field: "created_at_unix", direction: "asc" }
+    { field: 'created_at_unix', direction: 'asc' }
   );
 
   response.send(recentMessages);
   return;
   await handleHouseCleaningRequest(
-    "aN6aHcjcI2f4I6Lj1q4b",
+    'aN6aHcjcI2f4I6Lj1q4b',
     "I'm interested in a house cleaning and yard work. Especially the bathroom.",
     [],
     {
-      id: "13FvGLGcF9lBngquQ8it", // customer id
+      id: '13FvGLGcF9lBngquQ8it', // customer id
     },
-    "+18015747900",
-    "Jared Potter"
+    '+18015747900',
+    'Jared Potter'
   );
 
-  response.send("GOOD");
+  response.send('GOOD');
 });
 
 async function handleCustomerSms(request: any, response: any) {
@@ -79,12 +86,12 @@ async function handleCustomerSms(request: any, response: any) {
   const message = request.body.Body;
 
   // Lookup conversation
-  const peopleRef = FirebaseService.firestore.collectionGroup("people");
+  const peopleRef = FirebaseService.firestore.collectionGroup('people');
   const toPersonSnapshot = await peopleRef
-    .where("phone_number", "==", toPhoneNumber)
+    .where('phone_number', '==', toPhoneNumber)
     .get();
   const fromPersonSnapshot = await peopleRef
-    .where("phone_number", "==", fromPhoneNumber)
+    .where('phone_number', '==', fromPhoneNumber)
     .get();
 
   let conversation;
@@ -118,7 +125,7 @@ async function handleCustomerSms(request: any, response: any) {
   }
 
   if (!conversation) {
-    response.send({ error: "conversation not found" });
+    response.send({ error: 'conversation not found' });
     return;
   }
 
@@ -133,7 +140,7 @@ async function handleCustomerSms(request: any, response: any) {
 
   const now = Date.now();
 
-  await FirebaseService.addDoc("messages", newMessage);
+  await FirebaseService.addDoc('messages', newMessage);
 
   if (conversation.is_chat_gpt_enabled) {
     // pull in latest sorted messages from customer.
@@ -148,7 +155,7 @@ async function handleCustomerSms(request: any, response: any) {
           context: message.context ? message.context : null,
         });
       })
-      .join("\n");
+      .join('\n');
 
     let query = `
     I'm the owner of a concierge business and I received the following message from a customer: "${message}"\n
@@ -180,7 +187,7 @@ async function handleCustomerSms(request: any, response: any) {
       isANewOrExistingRequestResponse.is_new_request &&
       isANewOrExistingRequestResponse.is_certain
     ) {
-      console.log("IS NEW SERVICES REQUEST");
+      console.log('IS NEW SERVICES REQUEST');
       query = `
         I'm the owner of a concierge business and I received the following message from a customer: "${message}"\n
         I need help determining which services the customer is interested in. Services to specifically look for: 
@@ -217,7 +224,7 @@ async function handleCustomerSms(request: any, response: any) {
         newRequestServicesResponse &&
         newRequestServicesResponse.services.length > 0
       ) {
-        let servicesListString = newRequestServicesResponse.services.join(", ");
+        let servicesListString = newRequestServicesResponse.services.join(', ');
         servicesListString = servicesListString.slice(
           0,
           servicesListString.length
@@ -254,7 +261,7 @@ async function handleCustomerSms(request: any, response: any) {
           message: newMessageForCustomer,
         };
 
-        FirebaseService.addDoc("messages", newMessage);
+        FirebaseService.addDoc('messages', newMessage);
         sendMessage(
           newMessageForCustomer,
           fromPhoneNumber, // send to customer
@@ -264,9 +271,9 @@ async function handleCustomerSms(request: any, response: any) {
         const customerId = fromPersonDocSnapshot!.id;
 
         for (const service of newRequestServicesResponse.services) {
-          console.log("service " + service);
+          console.log('service ' + service);
 
-          if (service === "house_cleaning") {
+          if (service === 'house_cleaning') {
             await handleHouseCleaningRequest(
               customerId,
               message,
@@ -280,7 +287,7 @@ async function handleCustomerSms(request: any, response: any) {
       }
     } else {
       // An existing request.
-      console.log("IS EXISTING SERVICE REQUEST");
+      console.log('IS EXISTING SERVICE REQUEST');
 
       const query = `
       I'm the owner of a concierge business and I received the following message from a customer: "${message}"\n
@@ -316,7 +323,7 @@ async function handleCustomerSms(request: any, response: any) {
 
       if (chatGptResponse.service_request_id) {
         let serviceRequest = await FirebaseService.getDoc(
-          "service_requests",
+          'service_requests',
           chatGptResponse.service_request_id
         );
 
@@ -325,7 +332,7 @@ async function handleCustomerSms(request: any, response: any) {
 
           for (const path of Object.keys(chatGptResponse.fields)) {
             const value = chatGptResponse.fields[path];
-            const pathParts = path.split(".");
+            const pathParts = path.split('.');
             const result: any = {};
             let currentPart = result;
 
@@ -349,20 +356,20 @@ async function handleCustomerSms(request: any, response: any) {
           };
 
           await FirebaseService.updateDoc(
-            "service_requests",
+            'service_requests',
             serviceRequest,
             true
           );
         }
         serviceRequest = await FirebaseService.getDoc(
-          "service_requests",
+          'service_requests',
           serviceRequest!.id
         );
 
-        console.log("here: " + JSON.stringify(serviceRequest, null, 4));
+        console.log('here: ' + JSON.stringify(serviceRequest, null, 4));
         if (
           serviceRequest &&
-          serviceRequest.service_type === "house_cleaning"
+          serviceRequest.service_type === 'house_cleaning'
         ) {
           let houseCleaningServiceRequest = new HouseCleaningServiceRequest(
             serviceRequest
@@ -381,7 +388,7 @@ async function handleCustomerSms(request: any, response: any) {
               context: nextQuestion.context,
             };
 
-            await FirebaseService.addDoc("messages", newMessage);
+            await FirebaseService.addDoc('messages', newMessage);
           }
         }
       }
@@ -392,7 +399,7 @@ async function handleCustomerSms(request: any, response: any) {
   }
 
   response.send();
-  console.log("END - handleCustomerSms()");
+  console.log('END - handleCustomerSms()');
 }
 
 async function handleHouseCleaningRequest(
@@ -404,7 +411,7 @@ async function handleHouseCleaningRequest(
   customerName: string,
   existingServiceRequest: HouseCleaningServiceRequest | null = null
 ) {
-  console.log("START - handleHouseCleaningRequest()");
+  console.log('START - handleHouseCleaningRequest()');
 
   let houseCleaningServiceRequest = new HouseCleaningServiceRequest();
 
@@ -418,13 +425,13 @@ async function handleHouseCleaningRequest(
   } else {
     // new request.
     const newDoc = await FirebaseService.firestore
-      .collection("service_requests")
+      .collection('service_requests')
       .add({});
 
     houseCleaningServiceRequest.id = newDoc.id;
 
     await FirebaseService.updateDoc(
-      "service_requests",
+      'service_requests',
       houseCleaningServiceRequest.toFirestore(),
       true
     );
@@ -446,7 +453,7 @@ async function handleHouseCleaningRequest(
   // wait 10 seconds before sending next message
   await new Promise((resolve) => setTimeout(resolve, 10000));
 
-  await FirebaseService.addDoc("messages", newMessage);
+  await FirebaseService.addDoc('messages', newMessage);
 
   sendMessage(
     nextCustomerQuestionResponse.next_customer_question,
@@ -476,9 +483,9 @@ async function handleNewMessageCreated(event: any) {
 
 async function getRecentMessages(conversationId: string, count: number) {
   const messageQuerySnapshot = await FirebaseService.firestore
-    .collection("messages")
-    .where("conversation_id", "==", conversationId)
-    .orderBy("created_at_unix", "desc")
+    .collection('messages')
+    .where('conversation_id', '==', conversationId)
+    .orderBy('created_at_unix', 'desc')
     .limit(count)
     .get();
 
@@ -501,6 +508,25 @@ async function sendMessage(message: string, to: string, from: string) {
     // });
   } catch (error) {
     console.error(error);
+  }
+}
+
+async function keepSessionActive(event: any) {
+  const url = process.env.KEEP_SESSION_ACTIVE_URL;
+
+  try {
+    const response = await axios.post(url, {
+      query:
+        "I want a json code block that contains the field names of 'ep_1' through 'ep_6' and the values the year the first 6 star wars movies were released in a number format. No explantion.",
+    });
+
+    console.log(JSON.stringify(response.data), null, 4);
+  } catch (error) {
+    const response = await client.messages.create({
+      body: 'Keep alive session alive failed',
+      from: twilioPhoneNumber,
+      to: twilioAdminPhoneNumber,
+    });
   }
 }
 
