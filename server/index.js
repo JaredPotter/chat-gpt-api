@@ -470,7 +470,9 @@ async function sleep(ms) {
   await openChrome();
   await openChatGpt();
 
-  app.listen(3000, () => {
+  const port = process.platform === "linux" ? 6090 : 3000;
+
+  app.listen(port, () => {
     console.log("Server Started");
   });
 })();
