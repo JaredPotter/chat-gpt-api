@@ -4,7 +4,7 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 
 require("dotenv").config();
 const twilio = require("twilio");
-const axios = require("axios");
+const axios = require("axios").default;
 import FirebaseService from "./FirebaseService";
 import ChatGptService from "./ChatGptService";
 import HouseCleaningServiceRequest from "./models/HouseCleaningServiceRequest";
@@ -513,24 +513,36 @@ async function sendMessage(message: string, to: string, from: string) {
 async function keepSessionActive(event: any) {
   const url = process.env.KEEP_SESSION_ACTIVE_URL;
   const url2 = process.env.KEEP_SESSION_ACTIVE_URL_2;
+  console.log("url: " + url);
+  console.log("url2: " + url2);
+
+  const query =
+    "I want a JSON code block that contains the 6 original star wars films. I want an object where the key is ep_1 through ep_6. and the value is the year the corresponding star wars film was released. Note that in chronological order ep_4 was released first and ep_3 was released last. No explanation necessary.";
 
   try {
     let response = await axios.post(url, {
-      query:
-        "I want a JSON code block that contains the 6 original star wars films. I want an object where the key is ep_1 through ep_6. and the value is the year the corresponding star wars film was released. Note that in chronological order ep_4 was released first and ep_3 was released last. No explanation necessary.",
+      query,
+    });
+    console.log(JSON.stringify(response.data), null, 4);
+  } catch (error) {
+    console.log(JSON.stringify(error));
+    const response = await client.messages.create({
+      body: "Keep alive session alive failed - private mac",
+      from: twilioPhoneNumber,
+      to: twilioAdminPhoneNumber,
+    });
+  }
+
+  try {
+    let response = await axios.post(url2, {
+      query,
     });
 
     console.log(JSON.stringify(response.data), null, 4);
-
-    if (url2) {
-      await axios.post(url2, {
-        query:
-          "I want a JSON code block that contains the 6 original star wars films. I want an object where the key is ep_1 through ep_6. and the value is the year the corresponding star wars film was released. Note that in chronological order ep_4 was released first and ep_3 was released last. No explanation necessary.",
-      });
-    }
   } catch (error) {
+    console.log(JSON.stringify(error));
     const response = await client.messages.create({
-      body: "Keep alive session alive failed",
+      body: "Keep alive session alive failed - private linux ",
       from: twilioPhoneNumber,
       to: twilioAdminPhoneNumber,
     });

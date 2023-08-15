@@ -5,6 +5,8 @@ const axios = require("axios");
 const { spawn, spawnSync } = require("child_process");
 const asyncLock = require("async-lock");
 const lock = new asyncLock();
+require("dotenv").config();
+const https = require("https");
 
 fs.ensureDirSync("../cookies");
 
@@ -15,12 +17,24 @@ const COOKIES_PATH = "../cookies/latest_cookies.json";
 const WINDOW_HEIGHT = 1500;
 const WINDOW_WIDTH = 1000;
 let page;
+const httpsOptions = {
+  key: fs.readFileSync(process.env.CERTIFICATE_KEY_PATH),
+  cert: fs.readFileSync(process.env.CERTIFICATE_PATH),
+};
 
 const IS_DEV = process.argv[2] === "--is_dev" ? true : false;
 
 console.log("IS_DEV: " + IS_DEV);
 
 app.post("/api/chat", async (request, response) => {
+  const password = request.headers.authorization;
+
+  console.log(password);
+  if (password !== process.env.THE_PASSWORD) {
+    response.status(401).send("Wrong Password!");
+    return;
+  }
+
   const query = request.body.query;
   console.log(`/api/chat CALLED - query: ${query}`);
   let responseMessage = "";
@@ -472,7 +486,7 @@ async function sleep(ms) {
 
   const port = process.platform === "linux" ? 6090 : 3000;
 
-  app.listen(port, () => {
-    console.log("Server Started");
+  https.createServer(httpsOptions, app).listen(port, () => {
+    console.log(`Server running on https://localhost:${port}`);
   });
 })();
