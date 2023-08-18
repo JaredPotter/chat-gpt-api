@@ -2,6 +2,11 @@ SERVER
 
 Run on Mac
 
+Generate self-signed certificate
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+
+Set environment variables in `server/.env`
+
 To setup Server to always be running and automatically restart on fail -
 
 yarn add global pm2
@@ -10,6 +15,11 @@ yarn forever_start
 yarn forever_end
 
 Linux Setup
+
+Generate self-signed certificate
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+
+Set environment variables in `server/.env`
 
 - Ensure the following are installed
 

@@ -1,15 +1,28 @@
 import { onRequest } from "firebase-functions/v2/https";
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { onSchedule } from "firebase-functions/v2/scheduler";
+import https from "https";
+import fs from "fs";
+import dotenv from "dotenv";
+import twilio from "twilio";
+import axios from "axios";
 
-require("dotenv").config();
-const twilio = require("twilio");
-const axios = require("axios").default;
+dotenv.config();
+
 import FirebaseService from "./FirebaseService";
 import ChatGptService from "./ChatGptService";
 import HouseCleaningServiceRequest from "./models/HouseCleaningServiceRequest";
 import ServiceType from "./enums/ServiceType";
 import BaseServiceRequest from "./models/BaseServiceRequest";
+
+const httpsAgent = new https.Agent({
+  ca: fs.readFileSync("./cert_linux.pem"),
+});
+
+// console.log("httpsAgent: " + JSON.stringify(httpsAgent, null, 4));
+console.log("httpsAgent: " + httpsAgent);
+
+// const axiosInstance = axios.create({ httpsAgent });
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -23,7 +36,8 @@ const client = twilio(accountSid, authToken);
 const ADMIN_NAME = process.env.ADMIN_NAME;
 
 // Firebase Functions Exports
-exports.keepSessionActive = onSchedule("every 6 hours", keepSessionActive);
+// exports.keepSessionActive = onSchedule("every 6 hours", keepSessionActive);
+// exports.keepSessionActive = onSchedule("every 2 minutes", keepSessionActive);
 exports.handleCustomerSms = onRequest(handleCustomerSms);
 exports.handleNewMessageCreated = onDocumentCreated(
   "messages/{docId}",
@@ -31,6 +45,8 @@ exports.handleNewMessageCreated = onDocumentCreated(
 );
 exports.dev = onRequest(async (request, response) => {
   console.log("dev() function called");
+  await keepSessionActive();
+  return;
   //   let existingCustomerServiceRequests = await FirebaseService.getDocs(
   //     "service_requests",
   //     [
@@ -51,20 +67,20 @@ exports.dev = onRequest(async (request, response) => {
   //     (item) => item.completed_at_unix === null
   //   );
 
-  const recentMessages = await FirebaseService.getDocs(
-    "messages",
-    [
-      {
-        field: "id",
-        operator: "==",
-        value: "13FvGLGcF9lBngquQ8it",
-      },
-    ],
-    { field: "created_at_unix", direction: "asc" }
-  );
+  // const recentMessages = await FirebaseService.getDocs(
+  //   "messages",
+  //   [
+  //     {
+  //       field: "id",
+  //       operator: "==",
+  //       value: "13FvGLGcF9lBngquQ8it",
+  //     },
+  //   ],
+  //   { field: "created_at_unix", direction: "asc" }
+  // );
 
-  response.send(recentMessages);
-  return;
+  // response.send(recentMessages);
+  // return;
   await handleHouseCleaningRequest(
     "aN6aHcjcI2f4I6Lj1q4b",
     "I'm interested in a house cleaning and yard work. Especially the bathroom.",
@@ -510,33 +526,40 @@ async function sendMessage(message: string, to: string, from: string) {
   }
 }
 
-async function keepSessionActive(event: any) {
-  const url = process.env.KEEP_SESSION_ACTIVE_URL;
-  const url2 = process.env.KEEP_SESSION_ACTIVE_URL_2;
-  console.log("url: " + url);
+async function keepSessionActive() {
+  const url = process.env.KEEP_SESSION_ACTIVE_URL as string;
+  const url2 = process.env.KEEP_SESSION_ACTIVE_URL_2 as string;
+  // console.log("url: " + url);
   console.log("url2: " + url2);
 
   const query =
     "I want a JSON code block that contains the 6 original star wars films. I want an object where the key is ep_1 through ep_6. and the value is the year the corresponding star wars film was released. Note that in chronological order ep_4 was released first and ep_3 was released last. No explanation necessary.";
 
-  try {
-    let response = await axios.post(url, {
-      query,
-    });
-    console.log(JSON.stringify(response.data), null, 4);
-  } catch (error) {
-    console.log(JSON.stringify(error));
-    const response = await client.messages.create({
-      body: "Keep alive session alive failed - private mac",
-      from: twilioPhoneNumber,
-      to: twilioAdminPhoneNumber,
-    });
-  }
+  // try {
+  //   let response = await axios.post(url, {
+  //     query,
+  //
+  //   });
+  //   console.log(JSON.stringify(response.data), null, 4);
+  // } catch (error) {
+  //   console.log(JSON.stringify(error));
+  //   const response = await client.messages.create({
+  //     body: "Keep alive session alive failed - private mac",
+  //     from: twilioPhoneNumber,
+  //     to: twilioAdminPhoneNumber,
+  //   });
+  // }
 
   try {
-    let response = await axios.post(url2, {
-      query,
-    });
+    let response = await axios.post(
+      url2,
+      {
+        query,
+      },
+      {
+        httpsAgent,
+      }
+    );
 
     console.log(JSON.stringify(response.data), null, 4);
   } catch (error) {

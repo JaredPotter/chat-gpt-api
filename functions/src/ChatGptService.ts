@@ -10,7 +10,8 @@ async function queryChatGpt(query: string) {
   let attempts = 0;
   while (attempts < MAX_ATTEMPTS) {
     try {
-      const url = `http://${chatGptApiUrl}/api/chat`;
+      const url = `${chatGptApiUrl}/api/chat`;
+      console.log("Calling chat-gpt-api: " + url);
       const response = await axios.post(url, {
         query,
       });
