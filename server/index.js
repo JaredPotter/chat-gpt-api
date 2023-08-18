@@ -20,6 +20,7 @@ let page;
 const httpsOptions = {
   key: fs.readFileSync(process.env.CERTIFICATE_KEY_PATH, "utf8"),
   cert: fs.readFileSync(process.env.CERTIFICATE_PATH, "utf8"),
+  passphrase: process.env.PASSPHRASE,
 };
 
 const IS_DEV = process.argv[2] === "--is_dev" ? true : false;
