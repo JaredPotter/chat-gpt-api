@@ -18,8 +18,8 @@ const WINDOW_HEIGHT = 1500;
 const WINDOW_WIDTH = 1000;
 let page;
 const httpsOptions = {
-  key: fs.readFileSync(process.env.CERTIFICATE_KEY_PATH),
-  cert: fs.readFileSync(process.env.CERTIFICATE_PATH),
+  key: fs.readFileSync(process.env.CERTIFICATE_KEY_PATH, "utf8"),
+  cert: fs.readFileSync(process.env.CERTIFICATE_PATH, "utf8"),
 };
 
 const IS_DEV = process.argv[2] === "--is_dev" ? true : false;
