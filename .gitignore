@@ -11,4 +11,5 @@ chat-gpt-api-210d6-firebase-adminsdk-eeyap-cc9b9bdd38.json
 
 certs
 
-cert_linux.pem
+*.pem
+*.crt

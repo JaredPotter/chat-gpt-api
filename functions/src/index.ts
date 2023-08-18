@@ -16,7 +16,7 @@ import ServiceType from "./enums/ServiceType";
 import BaseServiceRequest from "./models/BaseServiceRequest";
 
 const httpsAgent = new https.Agent({
-  ca: fs.readFileSync("./cert_linux.pem"),
+  ca: fs.readFileSync("./cert_linux.crt"),
 });
 
 // console.log("httpsAgent: " + JSON.stringify(httpsAgent, null, 4));
@@ -558,6 +558,9 @@ async function keepSessionActive() {
       },
       {
         httpsAgent,
+        headers: {
+          Authorization: process.env.THE_PASSWORD,
+        },
       }
     );
 
